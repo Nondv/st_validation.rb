@@ -1,3 +1,4 @@
+require_relative '../abstract_validator'
 require_relative 'hash_validator'
 
 module StValidation

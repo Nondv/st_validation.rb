@@ -7,7 +7,6 @@ module StValidation
 
     def build(blueprint)
       case blueprint
-      when Proc, StValidation::Validators::AbstractValidator
         blueprint
       when Class
         ->(x) { x.is_a?(blueprint) }
@@ -19,6 +18,7 @@ module StValidation
         StValidation::Validators::HashValidator.new(blueprint)
       else
         raise InvalidBlueprintError
+      when Proc, StValidation::AbstractValidator
       end
     end
 

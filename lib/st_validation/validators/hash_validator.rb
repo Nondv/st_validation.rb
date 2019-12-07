@@ -1,4 +1,4 @@
-require_relative 'abstract_validator'
+require_relative '../abstract_validator'
 
 module StValidation
   module Validators

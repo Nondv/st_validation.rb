@@ -38,7 +38,7 @@ RSpec.describe StValidation do
     end
 
     it 'validators (like proc but has its own class)' do
-      less_than_validator_klass = Class.new(StValidation::Validators::AbstractValidator) do
+      less_than_validator_klass = Class.new(StValidation::AbstractValidator) do
         def initialize(number)
           @number = number
         end
