@@ -1,6 +1,9 @@
 require "st_validation/version"
+require "st_validation/error"
+require 'st_validation/validator_factory'
 
 module StValidation
-  class Error < StandardError; end
-  # Your code goes here...
+  def self.build(blueprint)
+    StValidation::ValidatorFactory.new.build(blueprint)
+  end
 end
