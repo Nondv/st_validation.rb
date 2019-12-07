@@ -1,0 +1,186 @@
+#+TITLE: St. Validation
+
+Incredibly simple and customisable validation DSL
+
+#+BEGIN_SRC ruby
+is_valid_user = StValidation.build(
+  id: Integer,
+  name: String,
+  age: ->(x) { x.is_a?(Integer) && (0..150).cover?(x) },
+  favourite_food: [String],
+  dog: Set[NilClass, { name: String, age: Integer, breed: Set[NilClass, String] }]
+)
+
+is_valid_user.call(
+  id: 123,
+  name: 'John',
+  age: 18,
+  favourite_food: %w[apples pies],
+  dog: { name: 'Lucky', age: 2 }
+)
+
+# ===> true
+#+END_SRC
+
+#+RESULTS:
+
+* Table of Contents   <-- :TOC: -->
+- [[#installation][Installation]]
+- [[#usage][Usage]]
+  - [[#terms][Terms]]
+  - [[#basic-syntax][Basic syntax]]
+  - [[#tinkering-dsl][Tinkering DSL]]
+- [[#contributing][Contributing]]
+- [[#license][License]]
+
+* Installation
+
+#+BEGIN_SRC ruby
+gem 'st_validation'
+#+END_SRC
+
+* Usage
+
+** Terms
+
+- *validator* - proc-predicate or an object from
+  `StValidation::AbstractValidator` family and used for validating an object.
+  This is what you want to get from this gem in the end.
+- *factory* - refers to a `StValidation::ValidatorFactory` and transforms
+  /blueprints/ into /validators/ by given set of /transformations/.
+  - *blueprint* - a validator or something that can be transformed into a
+    validator by factory.
+  - *transformation* - function =f(blueprint, factory)= returning a
+    /blueprint/. The core of the DSL itself.
+
+** Basic syntax
+
+All of these are blueprints. Some of them are composable, e.g arrays and
+hashes.
+
+*** Classes
+
+By using a class as a blueprint the result validator will check if an object
+belongs to the class.
+
+#+BEGIN_SRC ruby
+is_int = StValidation.build(Integer)
+is_int.call(123) # ==> true
+is_int.call('123') # ==> false
+#+END_SRC
+
+*** Sets (unions)
+
+Checks if a value matches /any/ provided blueprint.
+
+#+BEGIN_SRC ruby
+is_str_or_int = Set[String, Integer]
+is_str_or_int.call(123) # ==> true
+is_str_or_int.call('123') # ==> true
+#+END_SRC
+
+*** Arrays
+
+Arrays are defined via =[<blueprint>]=. The result validator checks if its
+every element matches =blueprint=. Note that array should be of /exactly/ one element.
+
+#+BEGIN_SRC ruby
+is_bool_array = StValidation.build([Set[TrueClass, FalseClass]])
+is_bool_array.call(true) # ==> false
+is_bool_array.call([]) # ==> true
+is_bool_array.call([false]) # ==> true
+#+END_SRC
+
+*** Hashes
+
+Quite naturally, hashes just check if every key matches a blueprint.
+
+#+BEGIN_SRC ruby
+is_user = StValidation.build(
+  id: Integer,
+  email: String,
+  info: { first_name: String,
+          last_name: String }
+)
+#+END_SRC
+
+**** When we don't care about additional keys
+
+There's a =HashSubsetValidator= for that. It checks only provided keys.
+
+#+BEGIN_SRC ruby
+is_user = StValidation::Validators::HashSubsetValidator.new(
+  id: Integer,
+  email: String,
+  info: { first_name: String,
+          last_name: String }
+)
+
+is_user.call(
+  id: 123,
+  email: 'user@example.com',
+  info: { first_name: 'John', last_name: 'Doe' },
+  phone: '+123456',
+  notes: 'Loves beer'
+)
+# ==> true
+#+END_SRC
+
+*** Misc
+
+**** Boolean
+
+Ruby doesn't have a class for bool value.
+Instead, it has =TrueClass= and =FalseClass= which we can use with in a set:
+
+#+BEGIN_SRC ruby
+is_bool = Set[TrueClass, FalseClass]
+#+END_SRC
+
+**** Maybe (optional values)
+
+Again, sets are to rescue:
+
+#+BEGIN_SRC ruby
+maybe_int = Set[NilClass, Integer]
+#+END_SRC
+
+** Tinkering DSL
+
+The ultimate goal of the factory is to return a validator.
+In order to generate a validator from a blueprint is to /transform/ it.
+
+Factory instance has a collection of transformations.
+Each of them is applied to a blueprint until there's no transformations done.
+
+Let's introduce some sugar syntax for booleans.
+
+#+BEGIN_SRC ruby
+factory = StValidation.with_extra_transformations(
+  ->(bp, factory) { bp == :bool ? Set[TrueClass, FalseClass] : bp  }
+)
+
+is_user = factory.build(
+  name: String,
+  loves_beer: :bool
+)
+
+is_user.call(name: 'John Doe', loves_beer: true) # ==> true
+#+END_SRC
+
+*** Important note!
+
+A blueprint goes through *all* transformations.
+The process stops when no transformation changed the blueprint.
+
+Do *not* rely on order; it's not guarantueed.
+
+
+* Contributing
+
+Bug reports and pull requests are welcome on GitHub at
+https://github.com/Nondv/st_validation.rb
+
+* License
+
+The gem is available as open source under the terms of the [MIT License](https://opensource.org/licenses/MIT).
