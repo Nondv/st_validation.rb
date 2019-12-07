@@ -3,7 +3,7 @@ require 'st_validation'
 
 RSpec.describe StValidation do
   def build(*args)
-    described_class.build(*args)
+    StValidation.build(*args)
   end
 
   it 'uses classes, sets, arrays and hashes for definiton' do
@@ -151,6 +151,29 @@ RSpec.describe StValidation do
         expect(validator.call(y: '5')).to be false
         expect(validator.call(x: 1, z: '5')).to be false
       end
+    end
+  end
+
+  describe 'additional transformations' do
+    it 'allows to tinker factory behaviour' do
+      factory = StValidation.with_extra_transformations(
+        ->(bp, _factory) { bp == :int ? Integer : bp },
+        lambda do |blueprint, _factory|
+          return blueprint unless blueprint == :positive
+
+          ->(value) { value.is_a?(Integer) && value.positive? }
+        end
+      )
+
+      validator = factory.build(
+        id: :int,
+        age: :positive,
+        fav_numbers: [:int]
+      )
+
+      expect(validator.call(id: 123, age: 18, fav_numbers: [1, 2, 3])).to be true
+      expect(validator.call(id: 123, age: -1, fav_numbers: [1, 2, 3])).to be false
+      expect(validator.call(id: 123, age: 18, fav_numbers: [1, '2', 3])).to be false
     end
   end
 end

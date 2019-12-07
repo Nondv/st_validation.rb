@@ -3,8 +3,7 @@ require_relative '../abstract_validator'
 module StValidation
   module Validators
     class HashValidator < AbstractValidator
-      def initialize(blueprint)
-        factory = StValidation::ValidatorFactory.new
+      def initialize(blueprint, factory)
         @validators = blueprint.map { |k, bp| [k, factory.build(bp)] }.to_h
       end
 
