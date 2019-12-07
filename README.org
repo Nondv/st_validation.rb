@@ -22,14 +22,21 @@ is_valid_user.call(
 # ===> true
 #+END_SRC
 
-#+RESULTS:
-
 * Table of Contents   <-- :TOC: -->
 - [[#installation][Installation]]
 - [[#usage][Usage]]
   - [[#terms][Terms]]
   - [[#basic-syntax][Basic syntax]]
+    - [[#classes][Classes]]
+    - [[#sets-unions][Sets (unions)]]
+    - [[#arrays][Arrays]]
+    - [[#hashes][Hashes]]
+      - [[#when-we-dont-care-about-additional-keys][When we don't care about additional keys]]
+    - [[#misc][Misc]]
+      - [[#boolean][Boolean]]
+      - [[#maybe-optional-values][Maybe (optional values)]]
   - [[#tinkering-dsl][Tinkering DSL]]
+    - [[#important-note][Important note!]]
 - [[#contributing][Contributing]]
 - [[#license][License]]
 
