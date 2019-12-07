@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'st_validation'
+require_relative '../../lib/st_validation'
 
 RSpec.describe StValidation do
   def build(*args)
@@ -174,6 +174,59 @@ RSpec.describe StValidation do
       expect(validator.call(id: 123, age: 18, fav_numbers: [1, 2, 3])).to be true
       expect(validator.call(id: 123, age: -1, fav_numbers: [1, 2, 3])).to be false
       expect(validator.call(id: 123, age: 18, fav_numbers: [1, '2', 3])).to be false
+    end
+  end
+
+  describe '#explain' do
+    it 'is supposed to work the same as #call but returning some info about invalid data' do
+      validator = StValidation.build(
+        id: Integer,
+        email: String,
+        info: {
+          name: String,
+          age: Set[NilClass, Integer],
+          favourite_food: [String]
+        }
+      )
+
+      result = validator.explain(
+        id: '123',
+        email: 'user@example.com',
+        info: {
+          name: 'John',
+          age: '18',
+          favourite_food: ['apple', :pies]
+        }
+      )
+
+      expect(result).to(
+        eq(id: 'expected Integer got String',
+           info: { age: ['expected NilClass got String',
+                         'expected Integer got String'],
+                   favourite_food: [nil, 'expected String got Symbol'] })
+      )
+    end
+
+    it 'shows source location for procs' do
+      is_age = ->(x) { x > 0 }
+      validator = StValidation.build(
+        id: Integer,
+        age: is_age
+      )
+
+      result = validator.explain(id: 123, age: -5)
+      expect(result).to eq(age: is_age.source_location)
+    end
+
+    it 'suppresses inner validators errors' do
+      is_valid_age = ->(x) { x > 0 }
+      validator = StValidation.build(
+        id: Integer,
+        age: is_valid_age
+      )
+
+      result = validator.explain(id: '123', age: '18')
+      expect(result[:age]).to start_with('#explain failed with ArgumentError')
     end
   end
 end

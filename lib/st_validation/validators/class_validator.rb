@@ -10,6 +10,14 @@ module StValidation
       def call(value)
         value.is_a?(@klass)
       end
+
+      private
+
+      def generate_explanation(value)
+        return nil if call(value)
+
+        "expected #{@klass} got #{value.class}"
+      end
     end
   end
 end

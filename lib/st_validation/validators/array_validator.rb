@@ -12,6 +12,14 @@ module StValidation
 
         value.all?(&@validator)
       end
+
+      private
+
+      def generate_explanation(value)
+        return 'not an array' unless value.is_a?(Array)
+
+        value.map { |e| @validator.explain(e) }
+      end
     end
   end
 end

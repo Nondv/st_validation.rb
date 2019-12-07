@@ -16,6 +16,12 @@ module StValidation
       def call(value)
         @validators.any? { |v| v.call(value) }
       end
+
+      private
+
+      def generate_explanation(value)
+        @validators.map { |v| v.explain(value) }
+      end
     end
   end
 end

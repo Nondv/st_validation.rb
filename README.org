@@ -1,5 +1,7 @@
 #+TITLE: St. Validation
 
+[[https://rubygems.org/gems/st_validation][https://badge.fury.io/rb/st_validation.svg]]
+
 Incredibly simple and customisable validation DSL
 
 #+BEGIN_SRC ruby
@@ -37,6 +39,7 @@ is_valid_user.call(
       - [[#maybe-optional-values][Maybe (optional values)]]
   - [[#tinkering-dsl][Tinkering DSL]]
     - [[#important-note][Important note!]]
+  - [[#explain][explain]]
 - [[#contributing][Contributing]]
 - [[#license][License]]
 
@@ -182,6 +185,25 @@ The process stops when no transformation changed the blueprint.
 
 Do *not* rely on order; it's not guarantueed.
 
+** explain
+
+For development purposes there's a =#explain= method defined in =StValidation::AbstractValidator=.
+The purpose of it is to show why a value didn't pass validation.
+
+For your custom validators you should implement =#generate_explanation(value)= method.
+
+#+BEGIN_SRC ruby
+validator = StValidation.build(
+  id: Integer,
+  email: String,
+)
+
+validator.explain(
+  id: '123',
+  email: 'user@example.com'
+)
+# ==> { id: 'Expected Integer got String' }
+#+END_SRC
 
 * Contributing
 
