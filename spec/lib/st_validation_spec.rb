@@ -17,7 +17,7 @@ RSpec.describe StValidation do
   end
 
   it 'raises exception when something irregular provided' do
-    error_class = StValidation::ValidatorFactory::InvalidBlueprintError
+    error_class = StValidation::InvalidBlueprintError
 
     expect { build(obj: Object.new) }.to raise_error(error_class)
     expect { build(key: :int) }.to raise_error(error_class)
@@ -98,7 +98,7 @@ RSpec.describe StValidation do
 
       it 'throws error when empty' do
         expect { build([]) }
-          .to raise_error(StValidation::ValidatorFactory::InvalidBlueprintError)
+          .to raise_error(StValidation::InvalidBlueprintError)
       end
     end
 
@@ -129,7 +129,7 @@ RSpec.describe StValidation do
 
       it 'throws error when empty' do
         expect { build(Set[]) }
-          .to raise_error(StValidation::ValidatorFactory::InvalidBlueprintError)
+          .to raise_error(StValidation::InvalidBlueprintError)
       end
     end
 

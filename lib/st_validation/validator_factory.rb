@@ -3,7 +3,6 @@ require_relative 'validators/hash_subset_validator'
 
 module StValidation
   class ValidatorFactory
-    class InvalidBlueprintError < StValidation::Error; end
 
     def build(blueprint)
       case blueprint
