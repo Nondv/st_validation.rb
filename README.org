@@ -40,6 +40,7 @@ is_valid_user.call(
   - [[#tinkering-dsl][Tinkering DSL]]
     - [[#important-note][Important note!]]
   - [[#explain][explain]]
+  - [[#testing][Testing]]
 - [[#contributing][Contributing]]
 - [[#license][License]]
 
@@ -203,6 +204,26 @@ validator.explain(
   email: 'user@example.com'
 )
 # ==> { id: 'Expected Integer got String' }
+#+END_SRC
+
+** Testing
+
+There's a rspec matcher:
+
+#+BEGIN_SRC ruby
+require 'st_validation/rspec'
+
+RSpec.describe 'user hash' do
+  it 'matches schema' do
+    user = build_user_hash
+    expect(user).to pass_st_validation(
+      id: Integer,
+      name: String,
+      age: Set[NilClass, Integer]
+    )
+  end
+end
+
 #+END_SRC
 
 * Contributing
