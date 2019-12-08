@@ -1,6 +1,6 @@
 #+TITLE: St. Validation
 
-[[https://rubygems.org/gems/st_validation][https://badge.fury.io/rb/st_validation.svg]]
+[[https://rubygems.org/gems/st_validation][https://badge.fury.io/rb/st_validation.svg]] [[https://travis-ci.org/Nondv/st_validation.rb][https://travis-ci.org/Nondv/st_validation.rb.svg?branch=master]]
 
 Incredibly simple and customisable validation DSL
 
