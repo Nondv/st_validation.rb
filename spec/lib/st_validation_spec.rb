@@ -195,7 +195,8 @@ RSpec.describe StValidation do
         info: {
           name: 'John',
           age: '18',
-          favourite_food: ['apple', :pies]
+          favourite_food: ['apple', :pies],
+          notes: 'brother of Jane Doe'
         }
       )
 
@@ -203,7 +204,8 @@ RSpec.describe StValidation do
         eq(id: 'expected Integer got String',
            info: { age: ['expected NilClass got String',
                          'expected Integer got String'],
-                   favourite_food: [nil, 'expected String got Symbol'] })
+                   favourite_food: [nil, 'expected String got Symbol'],
+                   notes: 'extra key detected' })
       )
     end
 
