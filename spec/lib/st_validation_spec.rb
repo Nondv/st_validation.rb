@@ -231,4 +231,27 @@ RSpec.describe StValidation do
       expect(result[:age]).to start_with('#explain failed with ArgumentError')
     end
   end
+
+  describe 'alternative1 DSL' do
+    let(:factory) { StValidation.with_transformations(StValidation.alternative1) }
+
+    it 'int array' do
+      is_int = factory.build(Integer)
+      is_int_array = factory.build([Array, ->(x) { x.all?(&is_int) }])
+      expect(is_int_array.call([1, 2, 3])).to be true
+      expect(is_int_array.call([])).to be true
+      expect(is_int_array.call(nil)).to be false
+      expect(is_int_array.call(%w[1 2 3])).to be false
+      expect(is_int_array.call([1, 2, '3'])).to be false
+      expect(is_int_array.call(['1', 2, 3])).to be false
+    end
+
+    it 'maybe int array' do
+      is_int = factory.build(Integer)
+      maybe_int_array = factory.build([Set[NilClass, [Array, ->(x) { x && x.all?(&is_int) }]]])
+      expect(maybe_int_array.call(nil)).to be true
+      expect(maybe_int_array.call([1, 2, 3])).to be true
+      expect(maybe_int_array.call([nil])).to be false
+    end
+  end
 end

@@ -13,15 +13,16 @@ module StValidation
     end
 
     def with_extra_transformations(*transformations)
-      all_transformations = transformations + basic_transformations
-      StValidation::ValidatorFactory.new(all_transformations)
+      with_transformations(transformations + basic_transformations)
     end
 
     def basic_factory
-      StValidation::ValidatorFactory.new(basic_transformations)
+      with_transformations(basic_transformations)
     end
 
-    private
+    def with_transformations(transformations)
+      StValidation::ValidatorFactory.new(transformations)
+    end
 
     def basic_transformations
       [
@@ -32,6 +33,27 @@ module StValidation
       ]
     end
 
+    def alternative1
+      [
+        ->(bp, _) { bp.is_a?(Class) ? class_validator(bp) : bp },
+        ->(bp, f) { bp.is_a?(Hash) ? hash_validator(bp, f) : bp },
+        ->(bp, f) { bp.is_a?(Set) ? union_validator(bp, f) : bp },
+        ->(bp, f) { bp.is_a?(Array) ? intersect_validator(bp, f) : bp }
+      ]
+    end
+
+    def alternative2
+      [
+        ->(bp, _) { bp.is_a?(Class) ? class_validator(bp) : bp },
+        ->(bp, f) { bp.is_a?(Hash) ? hash_validator(bp, f) : bp },
+        ->(bp, f) { bp.is_a?(Array) && bp[0] == :and ? intersect_validator(bp[1..-1], f) : bp },
+        ->(bp, f) { bp.is_a?(Array) && bp[0] == :or ? union_validator(bp[1..-1], f) : bp },
+        ->(bp, f) { bp.is_a?(Array) && bp[0] == :array ? array_validator(bp[1], f) : bp },
+      ]
+    end
+
+    private
+
     def class_validator(klass)
       Validators::ClassValidator.new(klass)
     end
@@ -40,12 +62,31 @@ module StValidation
       Validators::UnionValidator.new(blueprint, factory)
     end
 
+    def intersect_validator(blueprint, factory)
+      Validators::IntersectValidator.new(blueprint, factory)
+    end
+
     def array_validator(blueprint, factory)
       Validators::ArrayValidator.new(blueprint, factory)
     end
 
     def hash_validator(blueprint, factory)
       Validators::HashValidator.new(blueprint, factory)
+    end
+
+    def alternative2_array(blueprint, factory)
+      args = blueprint[1..-1]
+
+      case blueprint[0]
+      when :and
+        Validators::IntersectValidator.new(args, factory)
+      when :or
+        union_validator.new
+      when :array
+        Validators::ArrayValidator.new(args[0], factory)
+      else
+        raise InvalidBlueprintError
+      end
     end
   end
 end
