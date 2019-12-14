@@ -5,7 +5,7 @@ module StValidation
   module Validators
     # Use this when you don't care if there're extra keys set
     class HashSubsetValidator < AbstractValidator
-      def initialize(blueprint, factory = StValidation.basic_factory)
+      def initialize(blueprint, factory = StValidation.default_factory)
         @keys = blueprint.keys
         @hash_validator = StValidation::Validators::HashValidator.new(blueprint, factory)
       end

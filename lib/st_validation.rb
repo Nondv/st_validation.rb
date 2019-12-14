@@ -9,22 +9,22 @@ Dir[File.join(__dir__, 'st_validation', 'validators', '*.rb')].each { |file| req
 module StValidation
   class << self
     def build(blueprint)
-      basic_factory.build(blueprint)
+      default_factory.build(blueprint)
     end
 
     def with_extra_transformations(*transformations)
-      with_transformations(transformations + basic_transformations)
+      with_transformations(transformations + default_transformations)
     end
 
-    def basic_factory
-      with_transformations(basic_transformations)
+    def default_factory
+      with_transformations(default_transformations)
     end
 
     def with_transformations(transformations)
       StValidation::ValidatorFactory.new(transformations)
     end
 
-    def basic_transformations
+    def default_transformations
       [
         ->(bp, _factory) { bp.is_a?(Class) ? class_validator(bp) : bp },
         ->(bp, factory) { bp.is_a?(Set) ? union_validator(bp, factory) : bp },

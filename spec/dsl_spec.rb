@@ -62,7 +62,7 @@ RSpec.describe 'DSL examples' do
   end
 
   describe 'default' do
-    let(:factory) { StValidation.with_transformations(StValidation.basic_transformations) }
+    let(:factory) { StValidation.with_transformations(StValidation.default_transformations) }
     let(:is_int) { factory.build(Integer) }
     let(:is_maybe_int) { factory.build(Set[NilClass, Integer]) }
     let(:is_int_array) { factory.build([Integer]) }
