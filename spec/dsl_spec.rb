@@ -84,7 +84,7 @@ RSpec.describe 'DSL examples' do
   end
 
   describe 'default' do
-    let(:factory) { StValidation.with_transformations(StValidation.default_transformations) }
+    let(:factory) { StValidation.with_transformations(*StValidation.default_transformations) }
     let(:is_int_bp) { Integer }
     let(:is_maybe_int_bp) { Set[NilClass, Integer] }
     let(:is_int_array_bp) { [Integer] }
@@ -108,7 +108,7 @@ RSpec.describe 'DSL examples' do
   end
 
   describe 'alternative1' do
-    let(:factory) { StValidation.with_transformations(StValidation.alternative1) }
+    let(:factory) { StValidation.with_transformations(*StValidation.alternative1) }
     let(:is_int_bp) { Integer }
     let(:is_maybe_int_bp) { Set[NilClass, Integer] }
     let(:is_bool_bp) { Set[TrueClass, FalseClass] }
@@ -135,7 +135,7 @@ RSpec.describe 'DSL examples' do
   end
 
   describe 'alternative2' do
-    let(:factory) { StValidation.with_transformations(StValidation.alternative2) }
+    let(:factory) { StValidation.with_transformations(*StValidation.alternative2) }
     let(:is_int_bp) { Integer }
     let(:is_maybe_int_bp) { [:or, NilClass, Integer] }
     let(:is_int_array_bp) do
@@ -164,7 +164,7 @@ RSpec.describe 'DSL examples' do
   describe 'customised alternative2' do
     let(:factory) do
       StValidation
-        .with_transformations(StValidation.alternative2)
+        .with_transformations(*StValidation.alternative2)
         .with_extra_transformations(
           ->(bp, _) { bp == :bool ? [:or, TrueClass, FalseClass] : bp },
           ->(bp, _) { bp.is_a?(Regexp) ? ->(x) { !!(x =~ bp) } : bp },

@@ -156,7 +156,7 @@ RSpec.describe StValidation do
 
   describe 'additional transformations' do
     it 'allows to tinker factory behaviour' do
-      factory = StValidation.with_extra_transformations(
+      factory = StValidation.default_factory.with_extra_transformations(
         ->(bp, _factory) { bp == :int ? Integer : bp },
         lambda do |blueprint, _factory|
           return blueprint unless blueprint == :positive
@@ -233,7 +233,7 @@ RSpec.describe StValidation do
   end
 
   describe 'alternative1 DSL' do
-    let(:factory) { StValidation.with_transformations(StValidation.alternative1) }
+    let(:factory) { StValidation.with_transformations(*StValidation.alternative1) }
 
     it 'int array' do
       is_int = factory.build(Integer)

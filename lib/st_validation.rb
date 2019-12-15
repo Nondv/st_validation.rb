@@ -12,15 +12,11 @@ module StValidation
       default_factory.build(blueprint)
     end
 
-    def with_extra_transformations(*transformations)
-      with_transformations(transformations + default_transformations)
-    end
-
     def default_factory
-      with_transformations(default_transformations)
+      with_transformations(*default_transformations)
     end
 
-    def with_transformations(transformations)
+    def with_transformations(*transformations)
       StValidation::ValidatorFactory.new(transformations)
     end
 
