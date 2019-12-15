@@ -4,6 +4,7 @@ require_relative '../lib/st_validation'
 RSpec.describe 'DSL examples' do
   shared_examples 'examples' do
     it 'user data' do
+      is_user = factory.build(is_user_bp)
       expect(
         is_user.call(
           id: 123,
@@ -33,6 +34,7 @@ RSpec.describe 'DSL examples' do
     end
 
     it 'int' do
+      is_int = factory.build(is_int_bp)
       expect(is_int.call(1)).to be true
       expect(is_int.call(1.0)).to be false
       expect(is_int.call('1')).to be false
@@ -40,6 +42,7 @@ RSpec.describe 'DSL examples' do
     end
 
     it 'int array' do
+      is_int_array = factory.build(is_int_array_bp)
       expect(is_int_array.call([1, 2, 3])).to be true
       expect(is_int_array.call([])).to be true
       expect(is_int_array.call(nil)).to be false
@@ -49,35 +52,47 @@ RSpec.describe 'DSL examples' do
     end
 
     it 'maybe int' do
+      is_maybe_int = factory.build(is_maybe_int_bp)
       expect(is_maybe_int.call(1)).to be true
       expect(is_maybe_int.call(nil)).to be true
     end
 
     it 'one of fruits' do
+      is_one_of_fruits = factory.build(is_one_of_fruits_bp)
       expect(is_one_of_fruits.call('apple')).to be true
       expect(is_one_of_fruits.call('orange')).to be true
       expect(is_one_of_fruits.call('cucumber')).to be false
       expect(is_one_of_fruits.call('almond')).to be false
     end
+
+    it 'regexp' do
+      matches_regexp = factory.build(regexp_bp)
+      expect(matches_regexp.call('abc')).to be true
+      expect(matches_regexp.call('xx_abc_xx')).to be true
+      expect(matches_regexp.call('ab')).to be false
+      expect(matches_regexp.call('acb')).to be false
+      expect(matches_regexp.call(nil)).to be false
+    end
   end
 
   describe 'default' do
     let(:factory) { StValidation.with_transformations(StValidation.default_transformations) }
-    let(:is_int) { factory.build(Integer) }
-    let(:is_maybe_int) { factory.build(Set[NilClass, Integer]) }
-    let(:is_int_array) { factory.build([Integer]) }
-    let(:is_one_of_fruits) { Set['apple', 'orange'].method(:include?).to_proc }
-    let(:is_user) do
-      factory.build(
+    let(:is_int_bp) { Integer }
+    let(:is_maybe_int_bp) { Set[NilClass, Integer] }
+    let(:is_int_array_bp) { [Integer] }
+    let(:is_one_of_fruits_bp) { Set['apple', 'orange'].method(:include?).to_proc }
+    let(:regexp_bp) { ->(x) { !!(/abc/ =~ x) } }
+    let(:is_user_bp) do
+      {
         id: Integer,
         email: ->(x) { x.is_a?(String) && !!(x =~ /.+\@.+/) },
         admin: Set[TrueClass, FalseClass],
-        favourite_fruit: is_one_of_fruits,
+        favourite_fruit: is_one_of_fruits_bp,
         info: {
           phone: String,
           notes: Set[NilClass, String]
         }
-      )
+      }
     end
 
     include_examples 'examples'
@@ -85,21 +100,25 @@ RSpec.describe 'DSL examples' do
 
   describe 'alternative1' do
     let(:factory) { StValidation.with_transformations(StValidation.alternative1) }
-    let(:is_int) { factory.build(Integer) }
-    let(:is_maybe_int) { factory.build(Set[NilClass, Integer]) }
-    let(:is_int_array) { factory.build([Array, ->(x) { x.all?(&is_int) }]) }
-    let(:is_one_of_fruits) { Set['apple', 'orange'].method(:include?).to_proc }
-    let(:is_user) do
-      factory.build(
+    let(:is_int_bp) { Integer }
+    let(:is_maybe_int_bp) { Set[NilClass, Integer] }
+    let(:is_int_array_bp) do
+      is_int = factory.build(Integer)
+      [Array, ->(x) { x.all?(&is_int) }]
+    end
+    let(:is_one_of_fruits_bp) { Set['apple', 'orange'].method(:include?).to_proc }
+    let(:regexp_bp) { ->(x) { !!(/abc/ =~ x) } }
+    let(:is_user_bp) do
+      {
         id: Integer,
         email: [String, ->(x) { x =~ /.+\@.+/ }],
         admin: Set[TrueClass, FalseClass],
-        favourite_fruit: is_one_of_fruits,
+        favourite_fruit: is_one_of_fruits_bp,
         info: {
           phone: String,
           notes: Set[NilClass, String]
         }
-      )
+      }
     end
 
     include_examples 'examples'
@@ -107,21 +126,25 @@ RSpec.describe 'DSL examples' do
 
   describe 'alternative2' do
     let(:factory) { StValidation.with_transformations(StValidation.alternative2) }
-    let(:is_int) { factory.build(Integer) }
-    let(:is_maybe_int) { factory.build([:or, NilClass, Integer]) }
-    let(:is_int_array) { factory.build([:and, Array, ->(x) { x.all?(&is_int) }]) }
-    let(:is_one_of_fruits) { Set['apple', 'orange'].method(:include?).to_proc }
-    let(:is_user) do
-      factory.build(
+    let(:is_int_bp) { Integer }
+    let(:is_maybe_int_bp) { [:or, NilClass, Integer] }
+    let(:is_int_array_bp) do
+      is_int = factory.build(Integer)
+      [:and, Array, ->(x) { x.all?(&is_int) }]
+    end
+    let(:is_one_of_fruits_bp) { Set['apple', 'orange'].method(:include?).to_proc }
+    let(:regexp_bp) { ->(x) { !!(x =~ /abc/) } }
+    let(:is_user_bp) do
+      {
         id: Integer,
         email: [:and, String, ->(x) { x =~ /.+\@.+/ }],
         admin: [:or, TrueClass, FalseClass],
-        favourite_fruit: is_one_of_fruits,
+        favourite_fruit: is_one_of_fruits_bp,
         info: {
           phone: String,
           notes: [:or, NilClass, String]
         }
-      )
+      }
     end
 
     include_examples 'examples'
