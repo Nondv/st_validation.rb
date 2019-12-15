@@ -39,5 +39,9 @@ module StValidation
 
       result
     end
+
+    def with_extra_transformations(*extra_transformations)
+      ValidatorFactory.new(transformations + extra_transformations)
+    end
   end
 end

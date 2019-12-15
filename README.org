@@ -167,7 +167,7 @@ Each of them is applied to a blueprint until there's no transformations done.
 Let's introduce some sugar syntax for booleans.
 
 #+BEGIN_SRC ruby
-factory = StValidation.with_extra_transformations(
+factory = StValidation.default_factory.with_extra_transformations(
   ->(bp, factory) { bp == :bool ? Set[TrueClass, FalseClass] : bp  }
 )
 
