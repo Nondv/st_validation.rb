@@ -28,7 +28,7 @@ is_valid_user.call(
 - [[#installation][Installation]]
 - [[#usage][Usage]]
   - [[#terms][Terms]]
-  - [[#basic-syntax][Basic syntax]]
+  - [[#default-syntax][Default syntax]]
     - [[#classes][Classes]]
     - [[#sets-unions][Sets (unions)]]
     - [[#arrays][Arrays]]
@@ -63,9 +63,14 @@ gem 'st_validation'
     validator by factory.
   - *transformation* - function =f(blueprint, factory)= returning a
     /blueprint/. The core of the DSL itself.
+** Default syntax
 
-** Basic syntax
+The default syntax is not final. I'm still trying to figure out the best DSL to use.
+It needs to be minimal but yet practical and practicality is hard without being too complex.
 
+To see some examples, read [[spec/dsl_spec.rb][DSLs specs]].
+
+Current default DSL is described below.
 All of these are blueprints. Some of them are composable, e.g arrays and
 hashes.
 
