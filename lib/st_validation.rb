@@ -44,7 +44,7 @@ module StValidation
         ->(bp, f) { bp.is_a?(Hash) ? hash_validator(bp, f) : bp },
         ->(bp, f) { bp.is_a?(Array) && bp[0] == :and ? intersect_validator(bp[1..-1], f) : bp },
         ->(bp, f) { bp.is_a?(Array) && bp[0] == :or ? union_validator(bp[1..-1], f) : bp },
-        ->(bp, f) { bp.is_a?(Array) && bp[0] == :array ? array_validator(bp[1], f) : bp },
+        ->(bp, f) { bp.is_a?(Array) && bp[0] == :array ? array_validator(bp[1], f) : bp }
       ]
     end
 
@@ -68,21 +68,6 @@ module StValidation
 
     def hash_validator(blueprint, factory)
       Validators::HashValidator.new(blueprint, factory)
-    end
-
-    def alternative2_array(blueprint, factory)
-      args = blueprint[1..-1]
-
-      case blueprint[0]
-      when :and
-        Validators::IntersectValidator.new(args, factory)
-      when :or
-        union_validator.new
-      when :array
-        Validators::ArrayValidator.new(args[0], factory)
-      else
-        raise InvalidBlueprintError
-      end
     end
   end
 end

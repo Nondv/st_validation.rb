@@ -168,12 +168,7 @@ RSpec.describe 'DSL examples' do
         .with_extra_transformations(
           ->(bp, _) { bp == :bool ? [:or, TrueClass, FalseClass] : bp },
           ->(bp, _) { bp.is_a?(Regexp) ? ->(x) { !!(x =~ bp) } : bp },
-          ->(bp, _) { bp.is_a?(Set) ? ->(x) { bp.include?(x) } : bp },
-          lambda do |bp, f|
-            return bp unless bp.is_a?(Array) && bp[0] == :array
-
-            ->(x) { x.is_a?(Array) && x.all?(&f.build(bp[1])) }
-          end
+          ->(bp, _) { bp.is_a?(Set) ? ->(x) { bp.include?(x) } : bp }
         )
     end
 
